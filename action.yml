@@ -1,0 +1,13 @@
+name: 'Ren-C Action'
+description: 'Install and/or Invoke Ren-C Interpreter'
+inputs:
+  script:  # id of input
+    description: 'Script to Run'
+    required: true
+    # default: 'no sensible default for the script' 
+outputs:
+  path: # id of output
+    description: 'Where Ren-C was Installed (or where cache was found)'
+runs:
+  using: 'node12'
+  main: 'src/main.js'

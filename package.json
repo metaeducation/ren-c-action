@@ -1,0 +1,27 @@
+{
+  "name": "ren-c-action",
+  "version": "1.0.0",
+  "description": "Github Action For Installing Ren-C",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metaeducation/ren-c-action.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/metaeducation/ren-c-action/issues"
+  },
+  "homepage": "https://github.com/metaeducation/ren-c-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/exec": "^1.0.4",
+    "@actions/github": "^4.0.0",
+    "@actions/io": "^1.0.2",
+    "@actions/tool-cache": "^1.6.1"
+  }
+}
