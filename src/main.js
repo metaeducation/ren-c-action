@@ -27,7 +27,9 @@
 
 const core = require('@actions/core')
 const github = require('@actions/github')
+
 const get_cached_else_download = require('./cache').get_cached_else_download
+const invoke_script = require('./invoke').invoke_script
 
 
 //=//// TOP-LEVEL ASYNC run() FUNCTION /////////////////////////////////////=//
@@ -75,9 +77,10 @@ async function run() {
 
     const exePath = await get_cached_else_download()
 
-  //=//// RUN SCRIPT ///////////////////////////////////////////////////////=//
+  //=//// RUN SCRIPT (if provided) /////////////////////////////////////////=//
 
-    console.log(`Running Script ${script}!`)
+    if (script)
+        invoke_script(exePath, script)
 
   //=//// WRITE OUTPUTS ////////////////////////////////////////////////////=//
 

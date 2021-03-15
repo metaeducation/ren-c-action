@@ -3,11 +3,17 @@ description: 'Install and/or Invoke Ren-C Interpreter'
 inputs:
   script:  # id of input
     description: 'Script to Run'
-    required: true
-    # default: 'no sensible default for the script' 
+    required: false
 outputs:
   path: # id of output
     description: 'Where Ren-C was Installed (or where cache was found)'
 runs:
   using: 'node12'
-  main: 'src/main.js'
+
+  # When testing locally, you execute `node src/main.js` manually.
+  # (Runs with the copy of `node_modules` you get with `npm install`)
+  #
+  # GitHub Actions runs the compiled file, since we do not commit
+  # `node_modules`.  This compiled version is only on `release` branch.
+  #
+  main: 'dist/index.js'
