@@ -1,11 +1,11 @@
 //
-// src/invoke.js
+// src/native-invoke.js
 //
 //=//// NOTICE ////////////////////////////////////////////////////////////=//
 //
 // Editing this file and committing it--either in the master repository or in
 // your own clone--is insufficient to run it in the could as a GitHub Action.
-// It must be compiled and run from the %dist/ directory.  See README.md
+// It must be compiled and run from the %dist/ directory.  See BUILDING.md
 //
 //=////////////////////////////////////////////////////////////////////////=//
 //
@@ -55,7 +55,7 @@ function _getTempDirectory() {
   return tempDirectory
 }
 
-async function invoke_script(exePath, script)
+async function native_invoke(exePath, script)
 {
     // Trying to pass the script on the command line creates escaping problems.
     // We write the script to a temporary file.
@@ -64,8 +64,8 @@ async function invoke_script(exePath, script)
     core.info(`Writing script to temp file: ${tempScriptPath}`)
     await fsPromises.writeFile(tempScriptPath, script)
 
-    exec.exec(exePath, [tempScriptPath])
-    return 0
+    const exitcode = exec.exec(exePath, [tempScriptPath])
+    return exitcode
 }
 
-exports.invoke_script = invoke_script
+exports.native_invoke = native_invoke

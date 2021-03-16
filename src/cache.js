@@ -5,7 +5,7 @@
 //
 // Editing this file and committing it--either in the master repository or in
 // your own clone--is insufficient to run it in the could as a GitHub Action.
-// It must be compiled and run from the %dist/ directory.  See README.md
+// It must be compiled and run from the %dist/ directory.  See BUILDING.md
 //
 //=////////////////////////////////////////////////////////////////////////=//
 //

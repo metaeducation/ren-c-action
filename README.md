@@ -18,6 +18,11 @@ for instance `/opt/hostedtoolcache/ren-c/3.0.0/x64/r3`
 While the executable is added to the path via GitHub Actions `core.addPath()`
 facility, you can also retrieve the exact path as one of the action outputs.
 
+As an added capability, this same GitHub Action can use web automation of a
+local Firefox instance to run script code in the WebAssembly build.  The
+"Marionette" driver is used to feed the code as keystrokes to the browser,
+running against hosted builds of the Web REPL.
+
 [1]: https://github.com/actions/toolkit/tree/main/packages/tool-cache
 
 
@@ -29,7 +34,30 @@ Optional script code to run in the interpreter.  It accomplishes this by taking
 the code from the YAML and writing it to a file in the `$RUNNER_TEMP` directory
 and executing that.
 
-*(While this facility is currently modest and 
+*(While this facility is currently modest and just runs the code as-is, there
+are ambitions for it to be used with configurations that would make a dialect
+context, so that one could immediately be jumped into a domain-specific tool
+but still using this same GitHub Action for installation and caching.)*
+
+### `commit`
+
+This is the GitHub short hash of the commit to use.  It must be a deployed
+build (but not necessarily a "greenlit" build, which facilitates the usage of
+ren-c-action to do testing of a new build to see if it's worth of being marked
+as valid).
+
+### `web` (`true` or `false`, default is `false`)
+
+Run script code in the online version of the interpreter, by means of browser
+automation.  This feature currently only works on Ubuntu hosts, and uses the
+"Marionette" driver for controlling Firefox via WebSockets.
+
+### `timeout` (integer number of seconds)
+
+A timeout can already be set on individual GitHub steps via `timeout_minutes:`
+However, interactions with the web build through the Marionette driver for
+Firefox offer a timeout facility in milliseconds.  For the moment this is kept
+due to being more granular, but it only applies if `web: true`
 
 ### `checked` (`true` or `false`, default is `false`)
 

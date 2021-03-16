@@ -1,16 +1,41 @@
 name: 'Ren-C Action'
+
 description: 'Install and/or Invoke Ren-C Interpreter'
+
+# IMPORTANT: All inputs are received as strings, not JavaScript integers or
+# booleans.  So false here actually reads with `core.getInput()` as "false"
+# To reinforce that, all values here are set to look like strings.
+#
 inputs:
-  script:  # id of input
+  script:
     description: 'Script to Run'
+    required: 'false'
+
+  # !!! Review making this accept tagged stable versions (if those ever exist!)
+  #
+  commit:
+    description: 'Short Git Hash of Commit To Use'
+    required: 'false'
+
+  web:
+    description: 'Execute Script Code via Browser in the Web REPL'
+    required: 'false'
+    default: 'false'
+
+  timeout:
+    description: 'How Long to Run Script (only works for web mode)'
     required: false
-  checked:  # id of input
+
+  checked:
     description: 'Checked Build (e.g. With Debug Instrumentation)'
-    required: false
-    default: false
+    required: 'false'
+    default: 'false'
+
+
 outputs:
-  path: # id of output
+  path:
     description: 'Where Ren-C was Installed (or where cache was found)'
+
 runs:
   using: 'node12'
 
