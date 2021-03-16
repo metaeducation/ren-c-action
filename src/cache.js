@@ -42,16 +42,25 @@ const path = require('path')
 // https://nodejs.org/api/os.html#os_os
 const os = require('os')
 
+// For parity with how downloadTool etc. work, use GitHub's http request lib
+// https://github.com/actions/http-client
+const httpm = require('@actions/http-client')
 
-async function get_cached_else_download()
+
+// Note: No longer built by travis, we should change the name...
+//
+const CDN = 'https://metaeducation.s3.amazonaws.com/travis-builds'
+
+
+async function get_cached_else_download(checked)
 {
     const platform = os.platform()
-    if (platform !== 'linux' && platform !== 'win32' && platform !== 'darwin')
-        throw new Error(`Unexpected platform '${platform}'`)
 
-    let exeName = 'r3'
+    let extension = ''
     if (platform == 'win32')
-        exeName += ".exe"  // needs a .exe on windows
+        extension = '.exe'  // needed on windows
+
+    const exeName = 'r3' + extension
 
     const cacheKey = 'ren-c'
     const version = '3.0.0'  // see notes; must be "explicit" when cached
@@ -72,16 +81,58 @@ async function get_cached_else_download()
         return cachedPath
     }
 
+    // These are the OS_IDs following the historical numbering convention.
+    // All of the containers on GitHub Actions are 64-bit, meaning x.x.40
+    //
+    // https://github.com/metaeducation/ren-c/blob/master/tools/systems.r
+    //
+    let OS_ID
+    switch (platform) {
+      case 'linux':
+        OS_ID = '0.4.40'
+        break
+
+      case 'win32':
+        OS_ID = '0.3.40'
+        break
+
+      case 'darwin':
+        OS_ID = '0.2.40'
+        break
+
+      default:
+        throw new Error(`Unexpected platform '${platform}'`)
+    }
+
+    // The downloadTool function is not written atop something like the `fetch`
+    // API implemented for Node, but instead uses a GitHub Actions http-client:
+    //
+    // https://github.com/actions/http-client
+    //
+    // It's not clear what particular proxying issues this is designed to be
+    // working around, exactly...but for consistency, we use it here.  Fetch
+    // would be nicer.  :-/
+    //
+    _http = new httpm.HttpClient('http-ren-c-action')
+    core.info(`Finding out hash of most recent binary for ${OS_ID}`)
+    let res = await _http.get(`${CDN}/${OS_ID}/last-deploy.short-hash`)
+    let shorthash = await res.readBody()
+    core.info(`Last greenlit hash was ${shorthash}`)
+
     // downloadTool puts the file in the RUNNER_TEMP directory and gives a name
     // along the lines of `/tmp/73cac479-bfd0-42d7-a157-daef3602e987`.
     //
     // !!! Using a temporary file as proof of concept...needs to be coming from
     // our Amazon S3 instance as latest build.  Logic for that is more complex.
     //
-    const downloadPath = await tc.downloadTool(
-        'http://hostilefork.com/media/shared/github/r3-linux-dec-2020'
-    )
-    core.info(`r3 Transient Download To ${downloadPath}`)
+    let suffix = ''
+    if (checked)
+      suffix = '-debug'
+    let exeUrl = `${CDN}/${OS_ID}/r3-${shorthash}${suffix}${extension}`
+
+    core.info(`Attempting to Download ${exeUrl}`)
+    const downloadPath = await tc.downloadTool(exeUrl)
+    core.info(`r3 Transient Downloaded To ${downloadPath}`)
 
     // Use chmod +x to set the executable bit.  We do this on the download
     // rather than after the cache, in case there were some more restrictive

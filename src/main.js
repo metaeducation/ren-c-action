@@ -58,7 +58,24 @@ async function run() {
     // Extract the `inputs` defined in the %/action.yml file
     // The step invoking the action provides these as `with:` properties
     //
+    // NOTE: These are strings, so `false` is not JavaScript false, and `1`
+    // is not an integer.  They must be converted.
+    //
     const script = core.getInput('script')
+
+    let checked = core.getInput('checked')  // e.g. debug-instrumented
+    switch (checked) {
+      case 'true':
+        checked = true
+        break
+
+      case 'false':
+        checked = false
+        break
+
+      default:
+        throw new Error(`Checked must be 'true' or 'false', not '${checked}'`)
+    }
 
     // Beyond the `with:` parameters in the step, there is also information
     // associated with the "webhook" that triggered the workflow.  So if there
@@ -75,7 +92,7 @@ async function run() {
 
   //=//// DOWNLOAD INTERPRETER /////////////////////////////////////////////=//
 
-    const exePath = await get_cached_else_download()
+    const exePath = await get_cached_else_download(checked)
 
   //=//// RUN SCRIPT (if provided) /////////////////////////////////////////=//
 

@@ -4,6 +4,10 @@ inputs:
   script:  # id of input
     description: 'Script to Run'
     required: false
+  checked:  # id of input
+    description: 'Checked Build (e.g. With Debug Instrumentation)'
+    required: false
+    default: false
 outputs:
   path: # id of output
     description: 'Where Ren-C was Installed (or where cache was found)'
