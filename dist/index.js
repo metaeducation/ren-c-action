@@ -10031,7 +10031,11 @@ async function native_invoke(exePath, script)
     core.info(`Writing script to temp file: ${tempScriptPath}`)
     await fsPromises.writeFile(tempScriptPath, script)
 
-    const exitcode = exec.exec(exePath, [tempScriptPath])
+    // We use the `--fragment` setting in order to tell the command line
+    // processing not to change the directory to where the temporary
+    // script lives.
+
+    const exitcode = exec.exec(exePath, ['--fragment', tempScriptPath])
     return exitcode
 }
 
