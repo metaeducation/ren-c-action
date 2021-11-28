@@ -104,11 +104,6 @@ async function run() {
 
     let timeout = core.getInput('timeout')
     if (timeout) {
-        const timeout_int = parseInt(timeout, 10)
-        if (isNaN(timeout_int) || timeout_int < 0)
-            throw new Error(`Timeout must be integer, not: '${timeout}'`)
-        timeout = timeout_int
-
         // In the web build we have the timeout feature available from
         // Marionette.  However we'd have to involve some kind of watchdog
         // process for a native executable...and since the feature is already
@@ -117,6 +112,17 @@ async function run() {
         //
         if (!web)
             throw new Error('Use step timeout_minutes for running native r3')
+
+        const timeout_int = parseInt(timeout, 10)
+        if (isNaN(timeout_int) || timeout_int < 0)
+            throw new Error(`Timeout must be integer, not: '${timeout}'`)
+        timeout = timeout_int
+    }
+
+    let screenshot = core.getInput('screenshot')
+    if (screenshot) {
+        if (!web)
+            throw new Error('Screenshot is only applicable to web automation')
     }
 
     // Beyond the `with:` parameters in the step, there is also information
@@ -140,7 +146,25 @@ async function run() {
         if (!script)
             throw new Error(`Invoking Web Build Requires with: script:`)
 
-        await web_invoke(script, commit_short, timeout)
+        let exitcode = await web_invoke(
+            script,
+            commit_short,
+            timeout,
+            screenshot
+        )
+        switch (exitcode) {
+          case 0:  // success
+            break
+
+          case 1:  // timeout
+            core.setFailed("Script Timeout in Python Marionette Helper")
+            break
+
+          default:
+            core.setFailed("Unknown Error from Python Marionette Helper")
+            break
+        }
+
         exePath = '!!! web execution, nothing installed !!!'
     }
     else {
