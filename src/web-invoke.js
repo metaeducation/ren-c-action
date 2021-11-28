@@ -51,6 +51,10 @@ const tc = require('@actions/tool-cache')
 // https://github.com/actions/toolkit/tree/main/packages/tool-cache
 const io = require('@actions/io')
 
+// For simplicity we go ahead and make the screenshot artifact available
+// https://github.com/actions/toolkit/tree/master/packages/artifact
+const artifact = require('@actions/artifact')
+
 // For joining paths together in a platform independent way, correcting slashes
 // https://nodejs.org/api/path.html#path_path
 const path = require('path')
@@ -77,7 +81,7 @@ function _getTempDirectory() {
 }
 
 
-async function web_invoke(script, commit_short, timeout)
+async function web_invoke(script, commit_short, timeout, screenshot)
 {
     const verbose = true
 
@@ -166,12 +170,47 @@ async function web_invoke(script, commit_short, timeout)
 
     // Run the script.  The result will be 0 if the test was sucessful.
     //
-    // !!! We need to pass the script and the timeout.
-    //
     let args = [helperPath, tempScriptPath]
     if (commit_short)
         args.push('--shorthash', commit_short)
-    const exitcode = await exec.exec('python3', args)
+    if (timeout)
+        args.push('--timeout', timeout)
+    if (screenshot)
+        args.push('--screenshot', screenshot + ".png")
+
+    const options = {
+        ignoreReturnCode: true  // give us the non-zero status vs. erroring
+    }
+    const exitcode = await exec.exec('python3', args, options)
+
+    // If a screenshot was requested, we make life a little bit easier by
+    // automatically making that into an artifact.
+    //
+    if (screenshot) {
+        const artifactClient = artifact.create()
+        const artifactName = screenshot;
+        const files = [
+            screenshot + ".png"  // UI will always package as .zip regardless
+        ]
+
+        const rootDirectory = '.' // Also possible to use __dirname
+        const options = {
+            continueOnError: false
+        }
+
+        const uploadResponse = await artifactClient.uploadArtifact(
+            artifactName,
+            files,
+            rootDirectory,
+            options
+        )
+    }
+
+    if (verbose)
+        await exec.exec('sh -e -c "ps aux | grep firefox"')
+
+    // It doesn't seem firefox always closes, pkill it
+    await exec.exec('pkill -9 firefox', [], { ignoreReturnCode: true })
 
     return exitcode
 }
