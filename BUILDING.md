@@ -69,6 +69,12 @@ RUNNER_TEMP and RUNNER_TOOL_CACHE.  Here's the basic idea for Linux:
 
     npm install
 
+    # If on a virtualBox Shared Folder with no symlinks, try:
+    #
+    #     npm install --no-bin-links
+    #
+    # https://stackoverflow.com/questions/21425980/
+
     export RUNNER_TEMP=/tmp
     export RUNNER_TOOL_CACHE=/tmp
 
@@ -81,7 +87,17 @@ may be easier than figuring out how to pass it as parameters.
 
 Rather than put the `node_modules` on a separate branch, we follow the idea
 of using the `ncc` compiler to glom together just the JavaScript that is
-needed and put it into %dist/index.js:
+needed and put it into %dist/index.js.
+
+The NCC compiler documentation:
+
+  https://www.npmjs.com/package/@vercel/ncc
+
+To install it globally:
+
+    sudo npm i -g @vercel/ncc
+
+To build:
 
     ncc build src/main.js --license licenses.txt
 

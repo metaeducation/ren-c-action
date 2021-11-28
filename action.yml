@@ -9,26 +9,34 @@ description: 'Install and/or Invoke Ren-C Interpreter'
 inputs:
   script:
     description: 'Script to Run'
-    required: 'false'
+    required: false
+    default: ''
 
   # !!! Review making this accept tagged stable versions (if those ever exist!)
   #
   commit:
     description: 'Short Git Hash of Commit To Use'
-    required: 'false'
+    required: false
+    default: ''
 
   web:
     description: 'Execute Script Code via Browser in the Web REPL'
-    required: 'false'
+    required: false
     default: 'false'
 
   timeout:
     description: 'How Long to Run Script (only works for web mode)'
     required: false
+    default: ''
+
+  screenshot:
+    description: 'Browser Screenshot Artifact (only works for web mode)'
+    required: false
+    default: ''
 
   checked:
     description: 'Checked Build (e.g. With Debug Instrumentation)'
-    required: 'false'
+    required: false
     default: 'false'
 
 
