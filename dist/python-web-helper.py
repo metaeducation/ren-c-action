@@ -18,7 +18,7 @@
 
 from __future__ import print_function  # Python3 print(), must be first line
 import sys  # For sys.exit() to return result to shell, and commmand-line args
-import time  # For time.sleep(seconds)
+
 
 ### PYTHON ARGUMENT PARSING ###
 
@@ -122,11 +122,6 @@ except marionette.errors.ScriptTimeoutException:
     print("Never found the >> prompt after launching")
     active = None
     found = 0
-
-
-### WAIT A COUPLE SECONDS TO MAKE SURE ITS READY FOR INPUT ###
-
-time.sleep(2)
 
 
 ### INJECT CODE INTO REPLPAD AND WAIT FOR COMPLETION ###
